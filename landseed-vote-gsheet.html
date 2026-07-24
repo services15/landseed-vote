@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運動新世代｜副標票選</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:#F3F6FA;color:#0B1322;font-family:'Noto Sans TC',sans-serif;line-height:1.7;padding-bottom:80px}
+.hero{background:linear-gradient(180deg,#0A1428,#071022);color:#fff;padding:56px 24px 44px;text-align:center}
+.hero .k{font-family:'Space Grotesk',sans-serif;font-size:11px;letter-spacing:.38em;color:#7FB0FF;text-transform:uppercase}
+.hero h1{font-size:clamp(30px,6vw,46px);font-weight:900;letter-spacing:.1em;margin:12px 0 6px}
+.hero p{color:#9DB0CE;font-size:14px;max-width:560px;margin:0 auto}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px}
+.panel{background:#fff;border:1px solid #D8DFEA;border-radius:16px;padding:22px;margin-top:24px}
+.panel h2{font-size:16px;font-weight:900;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.panel h2::before{content:'';width:16px;height:3px;background:#1257E0;border-radius:2px}
+.nameRow input{width:100%;font-family:inherit;font-size:15px;padding:11px 16px;border:1.5px solid #D8DFEA;border-radius:10px;outline:none;background:#F8FAFD}
+.nameRow input:focus{border-color:#1257E0;background:#fff}
+.hint{font-size:12px;color:#5B6B84;margin-top:8px}
+.status{margin-top:10px;font-size:13px;font-weight:700;color:#0A6E3C}
+.status.err{color:#B3261E}
+.card{background:#fff;border:1.5px solid #D8DFEA;border-radius:16px;padding:22px;margin-top:16px;position:relative;overflow:hidden;transition:border-color .2s,box-shadow .2s}
+.card.sel{border-color:var(--c);box-shadow:0 8px 24px rgba(11,19,34,.10)}
+.card .stripe{position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+.cHead{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.badge{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:#fff;background:var(--c);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.cTitle{flex:1;min-width:220px}
+.cTitle .main{font-size:13px;letter-spacing:.28em;color:#5B6B84}
+.cTitle .en{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(19px,3vw,25px);letter-spacing:.02em;margin:2px 0}
+.cTitle .zh{font-size:14px;font-weight:700;color:#33415C}
+.brief{font-size:13.5px;color:#5B6B84;margin-top:10px}
+.toggle{background:none;border:none;color:#1257E0;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;padding:6px 0;margin-top:4px}
+.full{display:none;border-top:1px dashed #D8DFEA;margin-top:10px;padding-top:12px;font-size:14px;color:#33415C}
+.full.open{display:block}
+.full p{margin-bottom:8px}
+.voteBtn{margin-top:14px;font-family:inherit;font-size:15px;font-weight:900;letter-spacing:.1em;border:none;border-radius:10px;padding:12px 28px;cursor:pointer;background:#EDF2FA;color:#0B1322;transition:.2s}
+.voteBtn:hover{background:var(--c);color:#fff}
+.voteBtn.on{background:var(--c);color:#fff}
+.voteBtn:disabled{opacity:.5;cursor:not-allowed}
+.barRow{margin-top:14px}
+.barTop{display:flex;justify-content:space-between;font-size:13px;font-weight:700;margin-bottom:4px}
+.barTop .n{font-family:'Space Grotesk',sans-serif}
+.track{height:14px;background:#EDF2FA;border-radius:999px;overflow:hidden}
+.fill{height:100%;border-radius:999px;background:var(--c);transition:width .5s ease}
+.voters{font-size:12px;color:#8CA0BE;margin-top:3px}
+.lead{margin-top:16px;font-size:14px;font-weight:700}
+.toolRow{display:flex;gap:12px;margin-top:16px}
+.ghost{font-family:inherit;font-size:13px;font-weight:700;border:1.5px solid #D8DFEA;background:#fff;border-radius:8px;padding:8px 16px;cursor:pointer;color:#5B6B84}
+.ghost:hover{border-color:#1257E0;color:#1257E0}
+.note{font-size:11.5px;color:#8CA0BE;margin-top:20px;text-align:center}
+.warn{margin-top:24px;background:#FFF7E8;border:1px solid #EAD9AE;border-radius:12px;padding:14px 18px;font-size:13px;color:#7A5B12}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="k">Landseed Sports — Internal Vote</div>
+  <h1>運動新世代</h1>
+  <p>主標已定。以下 4 組副標由團隊提案，請每人投下 1 票——點開「完整文案」看全文再決定。可隨時改票，結果即時共見。</p>
+</div>
+
+<div class="wrap">
+  <div id="cfgWarn" class="warn" style="display:none">
+    ⚠️ 尚未設定後端：請打開本檔案，把最上方 CONFIG 區的 GAS_URL 換成你的 Apps Script 部署網址。
+  </div>
+
+  <div class="panel">
+    <h2>第一步｜你的名字</h2>
+    <div class="nameRow"><input id="nameInput" placeholder="輸入名字或暱稱（例：Luke）" maxlength="20"></div>
+    <div class="hint">一人一票，以名字為準；同名再投會覆蓋前一票（＝改票）。投票結果對所有開啟此頁的人公開可見。</div>
+    <div id="status" class="status" style="display:none"></div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="panel">
+    <h2 id="tallyTitle">即時開票</h2>
+    <div id="bars"></div>
+    <div id="lead" class="lead"></div>
+    <div class="toolRow">
+      <button class="ghost" id="refreshBtn">↻ 更新票數</button>
+    </div>
+  </div>
+
+  <div class="note">聯新體育 LANDSEED SPORTS｜副標內部票選・免登入・資料儲存於 Google Sheet</div>
+</div>
+
+<script>
+/* ======= CONFIG（換成你的 Apps Script 網頁應用程式部署網址） ======= */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyhevd39LWEDCC5NeVxGN2gcixe9nKUFjEztHr4PFe8q-tT7GJX-1Ciz0A6Jjf7ZYtKzA/exec";
+/* ================================================================ */
+
+const CANDIDATES = [
+ {id:"A",color:"#1257E0",en:"Ahead of the Game",zh:"運動新世代丨新型態運動文化的先行者",
+  brief:"慣用語原意即「領先一步」，Game 也廣泛指涉各類運動競技——聯新不是模仿跟隨，是本來就走在最前面。",
+  full:["▶︎ 品牌願景補充：Beyond Sports","「Ahead of the Game」講的是我們走在最前面；「Beyond Sports」講的是我們超越單一運動的界線——分別從時間與廣度，撐起「運動新世代」這個核心定位。","• 超越型態 — 不只傳統健身，更引進虛擬運動等新型態，持續讓大眾嘗試新的運動可能","• 超越運動本身 — 背後有聯新國際醫療支撐，提供的不只是運動指導，更包含科學訓練與醫體整合的完整服務","• 超越年齡 — 全齡皆可參與，服務對象不侷限於特定族群"]},
+ {id:"B",color:"#0A9E8C",en:"Dream Big, Plus Ultra.",zh:"大膽作夢，超越極限。",
+  brief:"以品牌宣言承接：我們不等待下一個世代到來，我們來定義下一個世代的運動。",
+  full:["聯新體育不只經營運動，更致力於創造新的運動文化。","我們結合健康、科技、場域與體驗，打破傳統運動的界線，讓運動走進每個人的生活，也開啟更多參與、連結與突破的可能。","我們不等待下一個世代到來。","我們來定義下一個世代的運動。","聯新體育，新型態運動文化的先行者。"]},
+ {id:"C",color:"#D9541E",en:"Sports Super Rookies. (SSR.)",zh:"運動不屬於少數人，屬於每一位願意開始的人。",
+  brief:"把「新世代」交還給每一位開始運動的人——每個人都是超級新人。",
+  full:["每一次挑戰，都從第一步開始。","每一次開始，都值得全力以赴。","每一次的全力以赴，都讓昨天的自己成為過去。"]},
+ {id:"D",color:"#B8860B",en:"The Great Age of SPORTS.",zh:"每一個新時代，都由率先啟航的人定義。",
+  brief:"大航海時代的敘事——聯新體育，選擇成為開啟運動新世代的先行者。",
+  full:["新的運動文化，正在形成。","新的運動體驗，持續誕生。","新的運動世代，正式展開。","聯新體育以運動場館為起點，串聯運動科學、醫療健康、智慧科技與多元生活，拓展運動的邊界，也重新定義人與運動的關係。","The Great Age of SPORTS.","由我們定義，下一個時代的運動。"]}
+];
+
+let votes = []; // {voter_key, voter_name, choice}
+let myChoice = null;
+let busy = false;
+
+const $ = id => document.getElementById(id);
+const configured = () => !GAS_URL.includes("YOUR-DEPLOY-ID");
+const keyOf = n => n.trim().replace(/[\s/\\'"]+/g,"_").toLowerCase();
+
+function setStatus(msg, err){
+  const el = $("status");
+  el.style.display = msg ? "block" : "none";
+  el.textContent = msg || "";
+  el.className = "status" + (err ? " err" : "");
+}
+
+function renderCards(){
+  $("cards").innerHTML = CANDIDATES.map(c => `
+    <div class="card ${myChoice===c.id?"sel":""}" style="--c:${c.color}" id="card-${c.id}">
+      <div class="stripe"></div>
+      <div class="cHead">
+        <div class="badge">${c.id}</div>
+        <div class="cTitle">
+          <div class="main">運動新世代</div>
+          <div class="en">${c.en}</div>
+          <div class="zh">${c.zh}</div>
+        </div>
+      </div>
+      <div class="brief">${c.brief}</div>
+      <button class="toggle" onclick="toggleFull('${c.id}')" id="tg-${c.id}">完整文案 ▼</button>
+      <div class="full" id="full-${c.id}">${c.full.map(p=>`<p>${p}</p>`).join("")}</div>
+      <button class="voteBtn ${myChoice===c.id?"on":""}" onclick="castVote('${c.id}')" ${busy?"disabled":""}>
+        ${myChoice===c.id ? "✓ 你目前投給這案" : "投給方案 " + c.id}
+      </button>
+    </div>`).join("");
+}
+
+function toggleFull(id){
+  const f = $("full-"+id), open = f.classList.toggle("open");
+  $("tg-"+id).textContent = open ? "收合文案 ▲" : "完整文案 ▼";
+}
+
+function renderTally(){
+  const total = votes.length;
+  $("tallyTitle").textContent = `即時開票（共 ${total} 票）`;
+  $("bars").innerHTML = CANDIDATES.map(c=>{
+    const list = votes.filter(v=>v.choice===c.id);
+    const pct = total ? Math.round(list.length/total*100) : 0;
+    return `<div class="barRow" style="--c:${c.color}">
+      <div class="barTop"><span>${c.id}｜${c.en}</span><span class="n">${list.length} 票 ・ ${pct}%</span></div>
+      <div class="track"><div class="fill" style="width:${pct}%"></div></div>
+      ${list.length ? `<div class="voters">${list.map(v=>v.voter_name).join("、")}</div>` : ""}
+    </div>`;
+  }).join("");
+  if(total){
+    const lead = CANDIDATES.reduce((b,c)=>votes.filter(v=>v.choice===c.id).length > votes.filter(v=>v.choice===b.id).length ? c : b, CANDIDATES[0]);
+    const n = votes.filter(v=>v.choice===lead.id).length;
+    $("lead").textContent = `目前領先：方案 ${lead.id}｜${lead.en}（${n} 票）`;
+  } else { $("lead").textContent = ""; }
+}
+
+async function loadVotes(){
+  if(!configured()) return;
+  try{
+    const r = await fetch(GAS_URL);
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error || "bad response");
+    votes = data.votes || [];
+    const name = $("nameInput").value.trim();
+    const mine = votes.find(v => v.voter_key === keyOf(name));
+    myChoice = mine ? mine.choice : null;
+    renderCards(); renderTally();
+  }catch(e){
+    setStatus("讀取票數失敗，請檢查網路或 Apps Script 部署設定", true);
+  }
+}
+
+async function castVote(id){
+  const name = $("nameInput").value.trim();
+  if(!name){ setStatus("請先輸入你的名字再投票", true); return; }
+  if(!configured()){ setStatus("尚未設定 Apps Script 網址，請先完成 CONFIG", true); return; }
+  busy = true; renderCards();
+  try{
+    // 不設 Content-Type，避免 CORS preflight（GAS 不處理 OPTIONS）
+    const r = await fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify({voter_key: keyOf(name), voter_name: name, choice: id})
+    });
+    if(!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    if(!data.ok) throw new Error(data.error || "write failed");
+    myChoice = id;
+    setStatus(`已投給方案 ${id}（同名再投會覆蓋，可隨時改票）`, false);
+    await loadVotes();
+  }catch(e){
+    setStatus("投票寫入失敗，請再試一次", true);
+  }finally{
+    busy = false; renderCards();
+  }
+}
+
+$("refreshBtn").addEventListener("click", loadVotes);
+$("nameInput").addEventListener("input", ()=>{
+  const mine = votes.find(v => v.voter_key === keyOf($("nameInput").value));
+  myChoice = mine ? mine.choice : null;
+  renderCards();
+});
+
+if(!configured()) $("cfgWarn").style.display = "block";
+renderCards(); renderTally(); loadVotes();
+setInterval(loadVotes, 15000);
+</script>
+</body>
+</html>
